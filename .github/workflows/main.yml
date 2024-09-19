@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        run: apt update && apt install -y yamllint python3-requests
+        run: sudo apt install -y yamllint python3-requests
       - name: Checkout
         uses: actions/checkout@v4
       - name: Generate Flathub apps.yaml file
