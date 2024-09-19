@@ -1,0 +1,42 @@
+name: Generate and publish Flathub apps yaml file
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: apt update && apt install -y yamllint python3-requests
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate Flathub apps.yaml file
+        run: python3 flathub_yaml.py > apps.yaml
+      - name: Validate apps.yaml
+        run: ./validate.sh
+      - name: Stage apps.yaml
+        run: mkdir _site && mv apps.yaml _site/
+      - name: Upload apps.yaml
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
