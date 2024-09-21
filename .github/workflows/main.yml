@@ -13,6 +13,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Add yq repo
+        run: sudo add-apt-repository ppa:rmescandon/yq
+      - name: Update repo metadata
+        run: sudo apt update
       - name: Install dependencies
         run: sudo apt install -y yamllint yq python3-requests
       - name: Checkout
