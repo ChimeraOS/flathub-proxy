@@ -14,16 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        run: sudo apt install -y yamllint python3-requests
+        run: sudo apt install -y yamllint yq python3-requests
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Generate Flathub apps.yaml file
-        run: python3 flathub_yaml.py > apps.yaml
-      - name: Validate apps.yaml
+      - name: Generate apps list
+        run: python3 flathub_yaml.py > apps.unsorted.yaml
+      - name: Sort apps list
+        run: yq 'sort_by(.name | downcase)' apps.unsorted.yaml > apps.yaml
+      - name: Validate apps list
         run: ./validate.sh
-      - name: Stage apps.yaml
+      - name: Stage apps list
         run: mkdir _site && mv apps.yaml _site/
-      - name: Upload apps.yaml
+      - name: Upload apps list
         uses: actions/upload-pages-artifact@v3
 
   deploy:
